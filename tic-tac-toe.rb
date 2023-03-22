@@ -1,5 +1,5 @@
 class Player
-  attr_reader :name #so game can access names
+  attr_reader :name 
 
   def initialize(name)
     @name = name
