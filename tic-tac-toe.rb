@@ -13,17 +13,16 @@ class Game
     @board = get_starting_board
     @winner = nil
     @curr_player = 1
-    @filled_squares = 0
+    @remaining_squares = (1..9).to_a
   end
 
   def play_game #this is called, where the looping happens etc
 
-    until winner || filled_squares > 8 
+    until winner || remaining_squares.length == 0
       move = get_move
       update_board(move)
       done = check_winner(move)
       record_winner if done
-      self.filled_squares += 1
       update_curr_player
       puts "The current board is: "
       pp board
@@ -66,10 +65,13 @@ class Game
       begin 
         move = gets.chomp.to_i
         if move.between?(1, 9)
+          self.remaining_squares.delete(move)
+          puts "remaining squares are: "
+          pp remaining_squares
           move = convert_move(move)
           return move
       rescue TypeError => e
-        puts "Move must be a number between 1 and 9."
+        puts "Remaining squares are #{self.remaining_squares.join(", ")}."
       end
     end
   end
@@ -153,3 +155,6 @@ class Game
     end
   end
 end
+
+game = Game.new
+game.play_game
