@@ -46,7 +46,7 @@ class Game
     board = Array.new(3) { Array.new(3) }
     3.times do |i|
       3.times do |j|
-        board[i][j] = 3 * i + j + 1 #should result in 1 - 9
+        board[i][j] = 3 * i + j + 1 #fill board with 1 - 9 to indicate choices
       end
     end
     board
