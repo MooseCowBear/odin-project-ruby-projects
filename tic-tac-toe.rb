@@ -67,6 +67,7 @@ class Game
         move = convert_move(move)
         return move
       end
+      puts "Remaining squares are: #{remaining_squares}"
     end
   end
 
