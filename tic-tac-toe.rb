@@ -8,8 +8,8 @@ end
 
 class Game
   def initialize #start new game by calling Game.new in main program
-    @player1 = get_player_name(1);
-    @player2 = get_player_name(2);
+    @player1 = get_player(1);
+    @player2 = get_player(2);
     @board = get_starting_board
     @winner = nil
     @curr_player = 1
@@ -22,7 +22,10 @@ class Game
       move = get_move
       update_board(move)
       done = check_winner(move)
-      record_winner if done
+      puts "Done: #{done}"
+      if done 
+        self.winner = curr_player > 1 ? player2 : player1 
+      end
       update_curr_player
       puts "The current board is: "
       pp board
@@ -33,19 +36,21 @@ class Game
   private
 
   attr_reader :player1, :player2
-  attr_accessor :board, :curr_player, :winner, :filled_squares
+  attr_accessor :board, :curr_player, :winner, :remaining_squares
 
-  def get_player_name(player_num)
+  def get_player(player_num)
     puts "Enter name for Player #{player_num}:"
     player_name = gets.chomp
-    player_name
+    Player.new(player_name)
   end
 
   def get_starting_board
-    board = Array.new(3, Array.new(3))
+    board = Array.new(3) { Array.new(3) }
     3.times do |i|
       3.times do |j|
+        puts "#{i}, #{j}"
         board[i][j] = 3 * i + j + 1 #should result in 1 - 9
+        pp board
       end
     end
     pp board
@@ -70,13 +75,14 @@ class Game
           pp remaining_squares
           move = convert_move(move)
           return move
+        end
       rescue TypeError => e
         puts "Remaining squares are #{self.remaining_squares.join(", ")}."
       end
     end
   end
 
-  def convert_move(move) #take number 1 - 9, and convert to indices
+  def convert_move(num) #take number 1 - 9, and convert to indices
     j = (num - 1) % 3
     puts "j: #{j}"
     i = (num - (j + 1)) / 3
@@ -90,7 +96,7 @@ class Game
   end
 
   def update_board(move) 
-    mark = get_mark(curr_player)
+    mark = get_mark
     row = move[0] 
     col = move[1]
     self.board[row][col] = mark
@@ -99,7 +105,7 @@ class Game
 
   def check_winner(move) 
     mark = get_mark
-    winning_row(move, mark) || winning_column(move, mark) || winning_diagonal(move, mark)
+    winning_row?(move, mark) || winning_column?(move, mark) || winning_diagonal?(move, mark)
   end
 
   def winning_row?(move, mark)
@@ -132,6 +138,7 @@ class Game
         break
       end
     end
+
     right_left = true
     3.times do |i|
       j = 2 - i
@@ -149,11 +156,14 @@ class Game
 
   def announce_result
     if winner 
-      puts "Congratulations, #{winner}!"
+      puts "Congratulations, #{winner.name}!"
     else
       puts "It's a draw"
     end
   end
+
+end
+
 end
 
 game = Game.new
