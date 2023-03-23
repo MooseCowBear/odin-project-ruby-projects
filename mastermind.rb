@@ -6,7 +6,7 @@ class Mastermind
 
   def play_game
     while guesses_remaining > 0
-      guess = get_guess
+      guess = get_player_guess #human as code breaker
       puts "guess: #{guess}"
       feedback = give_feedback(guess)
 
@@ -30,11 +30,22 @@ class Mastermind
     code
   end
 
-  def get_guess
-    puts "Make a guess: " #again needs validation
-    guess = gets.chomp
-    guess = guess.split("") #assumes they enter the guess like 123456
-    guess.map{ |elem| elem.to_i}
+  def get_player_guess
+    loop do
+      puts "Make a guess: " #again needs validation
+      guess = gets.chomp
+      guess = guess.split("") #assumes they enter the guess like 123456
+      guess.map{ |elem| elem.to_i}
+      if validate_guess(guess) {break}
+    end
+    guess
+  end
+
+  def validate_guess(guess)
+    if guess.lenth == 6 && guess.all? { |elem| (1..6).include?(elem) }
+      return true
+    end
+    false
   end
 
   def give_feedback(guess) #black (i.e. right color, right position) gets priority
