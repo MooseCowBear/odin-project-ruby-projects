@@ -197,12 +197,8 @@ class ComputerPlayer
   attr_accessor :viable, :not_viable
 
   def get_options
-    s = [
-      [1, 2, 3, 4, 5, 6], 
-      [1, 2, 3, 4, 5, 6], 
-      [1, 2, 3, 4, 5, 6], 
-      [1, 2, 3, 4, 5, 6]
-    ]
+    t = [1, 2, 3, 4, 5, 6]
+    s = Array.new(4, t)
 
     s[1..-1].reduce(s[0]){ |m,v| m = m.product(v).map(&:flatten) }
   end
