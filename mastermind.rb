@@ -39,9 +39,10 @@ class Mastermind
     @human_player = HumanPlayer.new
   end
 
-  #needs to ask make human player (outside loop), ask for who is codebreaker? inside loop
+  attr_accessor :guesses_remaining
 
-  def start_game 
+  def play_game 
+    feedback = nil
     loop do 
       get_codebreaker
       puts "codebreaker is human? : #{codebreaker_human}"
@@ -49,30 +50,23 @@ class Mastermind
       puts "code is set to: #code"
 
       unless winner
-        #elicit a guess, then provide feedback - both should be printed to console - check feedback for winner
+        #elicit a guess,
+        guess = get_player_guess(feedback)
+        #then provide feedback 
+        feedback = give_feedback(code, guess)
+        puts feedback
+        return  #FOR TESTING
 
-        check_win(feedback)
+        done = check_win(feedback)
+        if done { break }
+        self.guess_num += 1
       end
-  end
-
-  def play_game #NEEDS TO CHANGE
-
-    while guesses_remaining > 0
-      guess = get_player_guess #human as code breaker
-      puts "guess: #{guess}"
-      feedback = give_feedback(code, guess) #change to module method which passes code, guess
-
-      if guess == code
-        puts "You win!"
-        return 
-      end
-    end
+      annouce_winner
   end
 
   private
 
-  attr_accessor 
-    :guesses_remaining, 
+  attr_accessor  
     :winner, 
     :code, 
     :computer_player, 
@@ -105,9 +99,10 @@ class Mastermind
     self.code = code
   end
 
-  def get_player_guess
-    self.guess = codebreaker_human? get_human_player_guess : get_computer_guess
+  def get_player_guess(feedback)
+    guess = codebreaker_human? get_human_player_guess : get_computer_guess(guess)
     puts ("guess is now:: #{guess}")
+    guess
   end
 
   def get_human_player_guess
@@ -126,7 +121,8 @@ class Mastermind
     input
   end
 
-  def get_computer_guess
+  def get_computer_guess(feedback)
+    computer_player.make_guess(guess_num, feedback)
     computer_player.guess
   end
 
@@ -207,8 +203,8 @@ class ComputerPlayer
   def get_max_include(hypothetical_code)
     max_consistent = 0
     outcomes = [
-      [0, 0], [0,1], [0,2], [0,3], [0,4], [1,0], [1,1], 
-      [1,2], [1,3], [2,0], [2,1], [2,2], [3,0], [4,0]
+      "", "W", "WW", "WWW", "WWWW", "B", "BW", 
+      "BWW", "BWWW", "BB", "BBW", "BBWW", "BBB", "BBBB"
     ]
 
     outcomes.each do |outcome|
@@ -223,6 +219,17 @@ class ComputerPlayer
     end #end outcomes.each
     max_consistent
   end #end def
+
+  def make_guess(guess_num, feedback)
+    if guess_num == 1 { return guess }
+    end
+    puts "Thinking..."
+    calculate_next_guess(feedback)
+    x = guess.map{ |elem| elem.to_s }.join
+    puts "GUESS AS STRING: #{x}"
+    puts "My guess is #{x}"
+    guess
+  end
 
   def calculate_next_guess(feedback) #returns next guess
     not_viable = not_viable + remove_not_viable(feedback)
