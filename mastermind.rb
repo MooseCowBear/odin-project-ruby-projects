@@ -1,7 +1,7 @@
 module Feedback
-  def give_feedback(code, guess) #black (i.e. right color, right position) gets priority
+  def give_feedback(code, guess) 
     feedback = Array.new
-    check_color_code = Array.new #hang on to what's left over
+    check_color_code = Array.new 
     check_color_guess = Array.new
 
     code.each_with_index do |elem, index| #checking for exact matches
@@ -20,12 +20,9 @@ module Feedback
         check_color_guess.delete(elem)
       end
     end
-    puts "feedback for guess #{guess} for code #{code}:" #want to move print to start game bc only print for official guesses
-    pp feedback
-    feedback
+    feedback = feedback.join
   end
 end
-
 
 class Mastermind
   include Feedback
@@ -39,107 +36,110 @@ class Mastermind
     @human_player = HumanPlayer.new
   end
 
-  attr_accessor :guesses_remaining
-
   def play_game 
     feedback = nil
     loop do 
       get_codebreaker
-      puts "codebreaker is human? : #{codebreaker_human}"
       get_code
-      puts "code is set to: #code"
 
-      unless winner
-        #elicit a guess,
+      loop do
+        puts "Guess ##{13 - guesses_remaining}"
         guess = get_player_guess(feedback)
-        #then provide feedback 
         feedback = give_feedback(code, guess)
-        puts feedback
-        return  #FOR TESTING
-
+        pp feedback
         done = check_win(feedback)
-        if done { break }
-        self.guess_num += 1
+        break if done 
+        self.guesses_remaining -= 1
       end
       annouce_winner
+      puts "Would you like to play again? y/n"
+      again = gets.chomp
+      break unless again.downcase[0] == "y"
+      reset
+    end
   end
 
   private
-
-  attr_accessor  
-    :winner, 
-    :code, 
-    :computer_player, 
-    :human_player, 
-    :codebreaker_human
+  attr_accessor :winner, :computer_player, :human_player, :codebreaker_human, :guesses_remaining, :code
 
   def get_codebreaker
     loop do
       puts "Would you like to be the codebreaker? y/n"
-      
       preference = gets.chomp
-      
       if preference.downcase[0] == "y" 
         self.codebreaker_human = true
         break
+      elsif preference.downcase[0] == "n"
+        break
       end
+    end
   end
 
   def get_code 
-    self.code = codebreaker_human? computer_player.generate_code : human_player_code
+    if codebreaker_human 
+      self.code = computer_player.generate_code 
+    else
+      self.code = human_player_code
+    end
   end
 
   def human_player_code
+    code = nil
     loop do
       puts "Enter a code for the computer to guess: "
       code = gets.chomp
-      process_input(code)
-      if validate_guess(guess) { code }
+      code = process_input(code)
+      break if validate_guess(code)
     end
-    self.code = code
+    code
   end
 
   def get_player_guess(feedback)
-    guess = codebreaker_human? get_human_player_guess : get_computer_guess(guess)
-    puts ("guess is now:: #{guess}")
-    guess
+    if codebreaker_human
+      guess = get_human_player_guess
+      guess
+    else
+      guess = get_computer_guess(feedback)
+      guess
+    end
   end
 
   def get_human_player_guess
+    guess = nil
     loop do
       puts "Make a guess: " 
       guess = gets.chomp
-      process_input(guess)
-      if validate_guess(guess) { break }
+      guess = process_input(guess)
+      break if validate_guess(guess)
     end
     guess
   end
 
   def process_input(input)
-    input = input.split("") #assumes they enter the guess like 123456
-    input.map{ |elem| elem.to_i}
+    input = input.split("") #assumes they enter the guess like '1234'
+    input = input.map{ |elem| elem.to_i }
     input
   end
 
   def get_computer_guess(feedback)
-    computer_player.make_guess(guess_num, feedback)
+    computer_player.make_guess(guesses_remaining, feedback)
     computer_player.guess
   end
 
   def validate_guess(guess)
-    if guess.lenth == 6 && guess.all? { |elem| (1..6).include?(elem) }
+    if guess.length == 4 && guess.all? { |elem| (1..6).include?(elem) }
       return true
     end
     false
   end
 
   def check_win(feedback)
-    if feedback == "BBBB" 
+    if feedback == "BBBB"
       self.winner = codebreaker_human ? human_player : computer_player
-      true
+      return true
     elsif guesses_remaining == 0
       self.winner = codebreaker_human ? computer_player : human_player
-      true
+      return true
     end
     false
   end
@@ -152,36 +152,49 @@ class Mastermind
     end
   end
 
-  def reset #in case human says play again - don't want to reset human player
-    @code = nil
-    @guesses_remaining = 12
-    @winner = nil
-    @codebreaker_human = false
-    @computer_player = ComputerPlayer.new
+  def reset 
+    self.code = nil
+    self.guesses_remaining = 12
+    self.winner = nil
+    self.codebreaker_human = false
+    self.computer_player = ComputerPlayer.new
   end
+
 end
 
-## make a computer class that stores the algo for computer, its knowledge state etc
 class ComputerPlayer 
-
   include Feedback
+
   def initialize
     @viable = get_options
-    @not_viable = []
-    @guess = [1, 1, 2, 2] #starting guess
+    @not_viable = Array.new
+    @guess = [1, 1, 2, 2] 
   end
 
-  #guess read needs to be public 
-  attr_accessor :viable, :not_viable, :guess
+  attr_accessor :guess
 
   def generate_code #if computer is code maker
     code = Array.new
-    6.times do 
+    4.times do 
       code.push(rand(1..6))
     end
-    puts "code is: #{code}"
     code
   end
+
+  def make_guess(guesses_remaining, feedback)
+    if guesses_remaining == 12
+      puts "My guess is #{ guess.map{ |elem| elem.to_s }.join }"
+      return guess
+    end
+    puts "Thinking..."
+    calculate_next_guess(feedback)
+    puts "My guess is #{ guess.map{ |elem| elem.to_s }.join }"
+    guess
+  end
+
+  private
+
+  attr_accessor :viable, :not_viable
 
   def get_options
     s = [
@@ -195,9 +208,7 @@ class ComputerPlayer
   end
 
   def remove_not_viable(feedback)
-    x = viable.select{ |hypothetical_code| feedback != give_feedback(hypothetical_code, guess)} 
-    pp x
-    x
+    viable.select{ |hypothetical_code| feedback != give_feedback(hypothetical_code, guess)} 
   end
 
   def get_max_include(hypothetical_code)
@@ -220,30 +231,13 @@ class ComputerPlayer
     max_consistent
   end #end def
 
-  def make_guess(guess_num, feedback)
-    if guess_num == 1 { return guess }
-    end
-    puts "Thinking..."
-    calculate_next_guess(feedback)
-    x = guess.map{ |elem| elem.to_s }.join
-    puts "GUESS AS STRING: #{x}"
-    puts "My guess is #{x}"
-    guess
-  end
+  def calculate_next_guess(feedback) 
+    not_viable.concat(remove_not_viable(feedback))
+  
+    self.viable = viable.reject{ |elem| not_viable.include?(elem) } 
 
-  def calculate_next_guess(feedback) #returns next guess
-    not_viable = not_viable + remove_not_viable(feedback)
-    viable = viable.select{ |elem| not_viable.include?(elem) }
-    puts "viable after removing not viable elements: "
-    pp viable
-    puts "not_viable after update: "
-    pp not_viable
-
-    min_viable = Float::Infinity
+    min_viable = 1500
     min_viable_guess = nil
-
-    min_not_viable = Float::Infinity
-    min_not_viable_guess = nil
 
     viable.each do |x|
       score = get_max_include(x)
@@ -253,6 +247,9 @@ class ComputerPlayer
       end #end if
     end #end each
 
+    min_not_viable = 1500
+    min_not_viable_guess = nil
+
     not_viable.each do |x|
       score = get_max_include(x)
       if score < min_not_viable
@@ -260,18 +257,21 @@ class ComputerPlayer
         min_not_viable_guess = x
       end
     end
-    guess = min_viable <= min_not_viable ? min_viable_guess : min_not_viable_guess
-    puts "new guess: #{guess}"
+    self.guess = min_viable <= min_not_viable ? min_viable_guess : min_not_viable_guess
     guess
   end #end def
+
 end
 
 class HumanPlayer 
-  def initialize(name)
+  def initialize
     @name = get_name
   end
 
   attr_accessor :name
+
+  private
+
   def get_name
     puts "What is your name?"
     self.name = gets.chomp
