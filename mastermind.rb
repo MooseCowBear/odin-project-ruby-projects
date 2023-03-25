@@ -48,10 +48,13 @@ class Mastermind
         feedback = give_feedback(code, guess)
         pp feedback
         done = check_win(feedback)
-        break if done 
         self.guesses_remaining -= 1
+        break if done 
       end
       annouce_winner
+      if guesses_remaining == 0
+        puts "The code was #{code}."
+      end
       puts "Would you like to play again? y/n"
       again = gets.chomp
       break unless again.downcase[0] == "y"
