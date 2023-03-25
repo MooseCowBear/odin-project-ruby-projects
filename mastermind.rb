@@ -47,13 +47,13 @@ class Mastermind
         guess = get_player_guess(feedback)
         feedback = give_feedback(code, guess)
         pp feedback
-        done = check_win(feedback)
         self.guesses_remaining -= 1
+        done = check_win(feedback)
         break if done 
       end
       annouce_winner
       if guesses_remaining == 0
-        puts "The code was #{code}."
+        puts "The code was #{ code.map{ |elem| elem.to_s }.join }."
       end
       puts "Would you like to play again? y/n"
       again = gets.chomp
