@@ -1,40 +1,41 @@
-class Player
-  attr_reader :name 
+require_relative './board_game.rb'
+#require_relative './player.rb'
 
-  def initialize(name)
-    @name = name
-  end
-end
+class TicTacToe
+  include BoardGame
 
-class Game
-  def initialize 
-    @player1 = get_player(1);
-    @player2 = get_player(2);
+  attr_accessor :player1, :player2, :board, :curr_player, :winner, :remaining_squares
+
+  def initialize
+    @player1 = nil
+    @player2 = nil
     @board = get_starting_board
     @winner = nil
     @curr_player = 1
     @remaining_squares = (1..9).to_a
   end
 
-  def play_game 
-    until winner || remaining_squares.length == 0
-      puts "The current board is: "
-      print_board
-      move = get_move
-      update_board(move)
-      done = check_winner(move) 
-      if done 
-        self.winner = curr_player > 1 ? player2 : player1 
-      end
-      update_curr_player
-    end
+  #def play_game 
+   # self.player1 = get_player(1)
+    #self.player2 = get_player(2)
+
+    #until winner || remaining_squares.length == 0
+      #puts "The current board is: "
+      #print_board
+     # move = get_move
+      #update_board(move)
+      #check_winner(move) 
+      #update_curr_player
+    #end
+   # announce_result
+ # end
+
+  def play
+    self.player1 = get_player(1)
+    self.player2 = get_player(2)
+    display_turns
     announce_result
   end
-
-  private
-
-  attr_reader :player1, :player2
-  attr_accessor :board, :curr_player, :winner, :remaining_squares
 
   def get_player(player_num)
     puts "Enter name for Player #{player_num}:"
@@ -42,18 +43,25 @@ class Game
     Player.new(player_name)
   end
 
-  def get_starting_board
-    board = Array.new(3) { Array.new(3) }
-    3.times do |i|
-      3.times do |j|
-        board[i][j] = 3 * i + j + 1 #fill board with 1 - 9 to indicate choices
-      end
-    end
-    board
+  #new methods, to make it more like binary game
+
+  def take_turn
+    puts "The current board is: "
+    print_board
+    move = get_move
+    update_board(board, move, get_mark)
+    self.curr_player = update_player_turn(curr_player, 2)
+    game_winner = find_winner?(move)
+    record_winner if game_winner
   end
 
-  def update_curr_player 
-    self.curr_player = (curr_player % 2) + 1
+  def display_turns
+    take_turn until game_over?
+  end
+
+  def find_winner?(move) 
+    mark = get_mark
+    winning_row?(move, mark) || winning_column?(move, mark) || winning_diagonal?(move, mark) #going to have to rewrite these...and make it independent of move
   end
 
   def get_move
@@ -71,27 +79,41 @@ class Game
     end
   end
 
-  def convert_move(num) #take number 1 - 9, and convert to indices
+  def draw?
+    if winner.nil? && remaining_squares.empty?
+      return true
+    end
+    false
+  end
+
+  def game_over?
+    !winner.nil? || draw?
+  end
+
+  private
+
+  def get_starting_board
+    board = Array.new(3) { Array.new(3) }
+    3.times do |i|
+      3.times do |j|
+        board[i][j] = 3 * i + j + 1 #fill board with 1 - 9 to indicate choices
+      end
+    end
+    board
+  end
+
+  def update_curr_player 
+    self.curr_player = update_player_turn(curr_player, 2)
+  end
+
+  def convert_move(num) #take number 1 - 9, and convert to indices - replaced with module
     j = (num - 1) % 3
     i = (num - (j + 1)) / 3
     [i, j]
   end
 
   def get_mark #player1 is "X"
-     mark = curr_player > 1 ? "O" : "X"
-     mark
-  end
-
-  def update_board(move) 
-    mark = get_mark
-    row = move[0] 
-    col = move[1]
-    board[row][col] = mark
-  end
-
-  def check_winner(move) 
-    mark = get_mark
-    winning_row?(move, mark) || winning_column?(move, mark) || winning_diagonal?(move, mark)
+    curr_player > 1 ? "O" : "X"
   end
 
   def winning_row?(move, mark)
@@ -138,7 +160,7 @@ class Game
   end
 
   def record_winner
-    self.winner = curr_player > 1 ? player2 : player1
+    self.winner = curr_player > 1 ? player1 : player2 #bc curr player will be one ahead of winner if there is one
   end
 
   def announce_result
@@ -152,8 +174,4 @@ class Game
   def print_board
     board.each { |elem| pp elem }
   end
-
 end
-
-game = Game.new
-game.play_game

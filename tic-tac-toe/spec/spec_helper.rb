@@ -96,3 +96,7 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 end
+
+RSpec.configure do |c|
+  c.before { allow($stdout).to receive(:write)} #so won't print anything to console
+end
