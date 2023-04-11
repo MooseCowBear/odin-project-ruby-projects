@@ -1,5 +1,5 @@
 require_relative './board_game.rb'
-#require_relative './player.rb'
+require_relative './player.rb'
 
 class TicTacToe
   include BoardGame
@@ -15,21 +15,6 @@ class TicTacToe
     @remaining_squares = (1..9).to_a
   end
 
-  #def play_game 
-   # self.player1 = get_player(1)
-    #self.player2 = get_player(2)
-
-    #until winner || remaining_squares.length == 0
-      #puts "The current board is: "
-      #print_board
-     # move = get_move
-      #update_board(move)
-      #check_winner(move) 
-      #update_curr_player
-    #end
-   # announce_result
- # end
-
   def play
     self.player1 = get_player(1)
     self.player2 = get_player(2)
@@ -42,8 +27,6 @@ class TicTacToe
     player_name = gets.chomp
     Player.new(player_name)
   end
-
-  #new methods, to make it more like binary game
 
   def take_turn
     puts "The current board is: "
