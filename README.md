@@ -4,6 +4,8 @@
 
 A command line tic tac toe game. 
 
+With tests.
+
 ## Mastermind
 
 A command line recreation of Mastermind. 
