@@ -44,7 +44,7 @@ class TicTacToe
 
   def find_winner?(move) 
     mark = get_mark
-    winning_row?(move, mark) || winning_column?(move, mark) || winning_diagonal?(move, mark) #going to have to rewrite these...and make it independent of move
+    winning_row?(move, mark) || winning_column?(move, mark) || winning_diagonal?(move, mark)
   end
 
   def get_move
