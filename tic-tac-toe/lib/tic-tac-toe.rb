@@ -19,6 +19,7 @@ class TicTacToe
     self.player1 = get_player(1)
     self.player2 = get_player(2)
     display_turns
+    print_board
     announce_result
   end
 
@@ -33,9 +34,9 @@ class TicTacToe
     print_board
     move = get_move
     update_board(board, move, get_mark)
-    self.curr_player = update_player_turn(curr_player, 2)
     game_winner = find_winner?(move)
     record_winner if game_winner
+    self.curr_player = update_player_turn(curr_player, 2)
   end
 
   def display_turns
@@ -143,7 +144,7 @@ class TicTacToe
   end
 
   def record_winner
-    self.winner = curr_player > 1 ? player1 : player2 #bc curr player will be one ahead of winner if there is one
+    self.winner = curr_player > 1 ? player2 : player1 
   end
 
   def announce_result
