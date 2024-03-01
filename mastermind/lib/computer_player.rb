@@ -59,7 +59,7 @@ class ComputerPlayer < Player
     possible_codes.each do |code|
       outcome_tallies[feedback(code, hypothetical_guess)] += 1
     end
-    outcome_tallies.max_by{ |key, val| val }[1] # worst case is the greatest number of possible remaining codes
+    outcome_tallies.values.max # worst case is the greatest number of possible remaining codes
   end
 
   Guess = Struct.new(:guess, :score)
