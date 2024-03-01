@@ -1,4 +1,5 @@
 module Feedback
+  # using two hashes to keep track of unmatched elements, one for guess and one for code
   # def feedback(code, guess) 
   #   feedback = []
   #   code_unmatched = Hash.new(0) # do we need both??
@@ -21,12 +22,8 @@ module Feedback
   #   feedback.sort.join # want placement of B's and W's to be consistent
   # end
 
+  # using a single hash to keep track of unmatched elements from both code and guess 
   def feedback(code, guess) 
-    # using a single hash to keep track of unmatched elements from both code and guess
-    # if the code has an unmatched element, record it as +1 for key (where key is "color")
-    # if guess has an unmatched element, record it as -1 for key
-    # correct color, incorrect position elements are "matched" by checking the hash for 
-    # occurrence of element 
     feedback = []
     unmatched = Hash.new(0) 
 
@@ -40,8 +37,9 @@ module Feedback
         feedback << "W"
         unmatched[color] += 1 # remove the element that is now accounted for by a white peg
       else
-        unmatched[guess[index]] -= 1 # nothing we've seen matches guess[index]
-        unmatched[color] += 1 # nothing we've seen matched code[index], ie. color
+        # we haven't seen either guess[index] or color[index] before, so record each of them as unmatched
+        unmatched[guess[index]] -= 1 
+        unmatched[color] += 1 
       end
     end
     feedback.sort.join # want placement of B's and W's to be consistent
