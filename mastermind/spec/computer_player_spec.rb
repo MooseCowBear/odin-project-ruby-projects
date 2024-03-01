@@ -59,5 +59,18 @@ describe ComputerPlayer do
       expect(res).to eq best_impos.guess
       expect(test_player.guess).to eq best_impos.guess 
     end
+
+    # testing that we are getting the right results from make guess
+    context "when given specific scenarios" do
+      it "updates possible and impossible codes as expected and chooses the correct code" do
+        test_player.guess = [1, 1, 2, 2]
+        test_player.possible_codes = [[1, 1, 1, 1], [1, 1, 3, 3], [1, 1, 3, 4], [2, 2, 1, 1], [3, 3, 3, 3]]
+        test_player.impossible_codes = []
+        res = test_player.make_guess("BB")
+        expect(test_player.possible_codes).to match_array([[1, 1, 1, 1], [1, 1, 3, 3], [1, 1, 3, 4]])
+        expect(test_player.impossible_codes).to match_array([[2, 2, 1, 1], [3, 3, 3, 3]])
+        expect(res).to eq([1, 1, 3, 3]).or(eq([1, 1, 3, 4]))
+      end
+    end
   end
 end

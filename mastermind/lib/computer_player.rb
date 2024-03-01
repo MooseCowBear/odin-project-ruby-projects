@@ -20,10 +20,10 @@ class ComputerPlayer < Player
       best_pos = best_guess_from(possible_codes)
       best_impos = best_guess_from(impossible_codes)
 
-      if best_impos[:score] < best_pos[:score]
-        self.guess = best_impos[:guess]
+      if best_impos.score < best_pos.score
+        self.guess = best_impos.guess
       else 
-        self.guess = best_pos[:guess]
+        self.guess = best_pos.guess
       end
     end
     guess 
@@ -62,6 +62,8 @@ class ComputerPlayer < Player
     outcome_tallies.max_by{ |key, val| val }[1] # worst case is the greatest number of possible remaining codes
   end
 
+  Guess = Struct.new(:guess, :score)
+
   def best_guess_from(codes)
     min_score = 1296
     best_guess = nil
@@ -73,6 +75,6 @@ class ComputerPlayer < Player
         best_guess = code
       end
     end
-    { guess: best_guess, score: min_score }
+    Guess.new(best_guess, min_score)
   end
 end
