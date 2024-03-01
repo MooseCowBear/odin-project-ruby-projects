@@ -48,7 +48,7 @@ class Mastermind
     feedback = nil
     while guesses_remaining > 0 && !code_broken
       announce_round
-      guess = get_guess(codebreaker, feedback)
+      guess = get_guess(feedback)
       feedback = feedback(code, guess)
       announce_feedback(guess, feedback)
       update_code_broken(feedback)
@@ -64,8 +64,8 @@ class Mastermind
     puts "#{codebreaker.name} guessed: #{guess.join}. The feedback for #{codebreaker.name}'s guess is '#{feedback}'"
   end
 
-  def get_guess(player, feedback)
-    player.make_guess(feedback)
+  def get_guess(feedback)
+    codebreaker.make_guess(feedback)
   end
 
   def update_round
