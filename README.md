@@ -20,19 +20,19 @@ The main method for getting the next computer guess:
 
 ```
 def make_guess(prev_feedback)
-	update_codes(prev_feedback) if prev_feedback
+  update_codes(prev_feedback) if prev_feedback
 
-	if impossible_codes.length > 0
-		best_pos = best_guess_from(possible_codes)
-		best_impos = best_guess_from(impossible_codes)
+  if impossible_codes.length > 0
+    best_pos = best_guess_from(possible_codes)
+    best_impos = best_guess_from(impossible_codes)
 
-		if best_impos.score < best_pos.score
-			self.guess = best_impos.guess
-		else 
-			self.guess = best_pos.guess
-		end
-	end
-	guess 
+    if best_impos.score < best_pos.score
+      self.guess = best_impos.guess
+    else 
+      self.guess = best_pos.guess
+    end
+  end
+  guess 
 end
 ```
 
@@ -40,17 +40,17 @@ The method to get the best scoring code from a set of codes:
 
 ```
 def best_guess_from(codes)
-	min_score = 1296
-	best_guess = nil
+  min_score = 1296
+  best_guess = nil
 
-	codes.each do |code|
-		score = score(code)
-		if score < min_score
-			min_score = score
-			best_guess = code
-		end
-	end
-	Guess.new(best_guess, min_score)
+  codes.each do |code|
+    score = score(code)
+    if score < min_score
+      min_score = score
+      best_guess = code
+    end
+  end
+  Guess.new(best_guess, min_score)
 end
 ```
 
@@ -58,12 +58,12 @@ The method for determining the score of a code, ie. its worst outcome, ie. the g
 
 ```
 def score(hypothetical_guess)
-	outcome_tallies = Hash.new(0)
+  outcome_tallies = Hash.new(0)
 
-	possible_codes.each do |code|
-		outcome_tallies[feedback(code, hypothetical_guess)] += 1
-	end
-	outcome_tallies.values.max 
+  possible_codes.each do |code|
+    outcome_tallies[feedback(code, hypothetical_guess)] += 1
+  end
+  outcome_tallies.values.max 
 end
 ```
 
