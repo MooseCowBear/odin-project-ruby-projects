@@ -1,7 +1,7 @@
 require_relative "./player.rb"
 
 class HumanPlayer < Player
-  def initialize(name)
+  def initialize(name = nil)
     super(name || get_name)
   end
 
@@ -17,7 +17,7 @@ class HumanPlayer < Player
 
   def get_name
     puts "What is your name?"
-    self.name = gets.chomp
+    gets.chomp
   end
 
   def valid?(input)
