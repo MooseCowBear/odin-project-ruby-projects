@@ -14,16 +14,16 @@ class ComputerPlayer < Player
   end
 
   def make_guess(prev_feedback)
-    if impossible_codes.length > 0
-      update_codes(prev_feedback)
+    update_codes(prev_feedback) if prev_feedback
 
+    if impossible_codes.length > 0
       best_pos = best_guess_from(possible_codes)
       best_impos = best_guess_from(impossible_codes)
 
-      if best_impos.score < best_pos.score
-        self.guess = best_impos.guess
+      if best_impos[:score] < best_pos[:score]
+        self.guess = best_impos[:guess]
       else 
-        self.guess = best_pos.guess
+        self.guess = best_pos[:guess]
       end
     end
     guess 
@@ -49,20 +49,18 @@ class ComputerPlayer < Player
   end
 
   def consistent?(prev_feedback, code)
-    feedback(code, prev_guess) == prev_feedback # would this code give me the feedback I got?
+    feedback(code, guess) == prev_feedback # would this code give me the feedback I got?
   end
 
   def score(hypothetical_guess)
     # calculate the worst outcome for this guess
-    outcome_tallies = {}
+    outcome_tallies = Hash.new(0)
 
     possible_codes.each do |code|
       outcome_tallies[feedback(code, hypothetical_guess)] += 1
     end
-    outcome_tallies.max_by{ |key, val| val } # worst case is the greatest number of possible remaining codes
+    outcome_tallies.max_by{ |key, val| val }[1] # worst case is the greatest number of possible remaining codes
   end
-
-  Guess = Struct.new(:guess, :score)
 
   def best_guess_from(codes)
     min_score = 1296
@@ -75,6 +73,6 @@ class ComputerPlayer < Player
         best_guess = code
       end
     end
-    Guess.new(guess: best_guess, score: min_score)
+    { guess: best_guess, score: min_score }
   end
 end
