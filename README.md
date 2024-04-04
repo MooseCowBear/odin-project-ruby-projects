@@ -22,16 +22,17 @@ The main method for getting the next computer guess:
 def make_guess(prev_feedback)
   update_codes(prev_feedback) if prev_feedback
 
-  if impossible_codes.length > 0
-    best_pos = best_guess_from(possible_codes)
-    best_impos = best_guess_from(impossible_codes)
+  return guess if impossible_codes.length == 0
 
-    if best_impos.score < best_pos.score
-      self.guess = best_impos.guess
-    else 
-      self.guess = best_pos.guess
-    end
+  best_pos = best_guess_from(possible_codes)
+  best_impos = best_guess_from(impossible_codes)
+
+  if best_impos.score < best_pos.score
+    self.guess = best_impos.guess
+  else 
+    self.guess = best_pos.guess
   end
+
   guess 
 end
 ```
